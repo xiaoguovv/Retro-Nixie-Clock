@@ -1,0 +1,5 @@
+{
+  "name": "Retro Nixie Clock",
+  "description": "A photorealistic Nixie tube clock simulation with manual time setting and auto-sync capabilities, optimized for tablet displays.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <meta name="theme-color" content="#000000" />
+    <title>Retro Nixie Clock</title>
+    <meta name="description" content="High fidelity Nixie Tube clock" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Imports: Nixie One, Share Tech Mono, Orbitron, Wallpoet -->
+    <link href="https://fonts.googleapis.com/css2?family=Nixie+One&family=Orbitron:wght@400;700&family=Share+Tech+Mono&family=Wallpoet&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background-color: #050505;
+        overflow: hidden; /* Prevent scrolling for app-like feel */
+        touch-action: none;
+      }
+      
+      /* Custom scrollbar hiding */
+      ::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Glow Animation for the tubes */
+      @keyframes flicker {
+        0% { opacity: 0.98; }
+        5% { opacity: 0.95; }
+        10% { opacity: 0.98; }
+        15% { opacity: 0.99; }
+        20% { opacity: 0.95; }
+        50% { opacity: 0.98; }
+        100% { opacity: 1; }
+      }
+      
+      .tube-glow {
+        animation: flicker 0.1s infinite alternate;
+      }
+
+      /* Unstable Voltage / Glitch Animation */
+      @keyframes unstable-voltage {
+        0% { opacity: 1; }
+        3% { opacity: 0.6; }
+        5% { opacity: 0.9; }
+        6% { opacity: 1; }
+        25% { opacity: 1; }
+        26% { opacity: 0.3; }
+        28% { opacity: 1; }
+        29% { opacity: 0.2; }
+        30% { opacity: 1; }
+        55% { opacity: 1; }
+        56% { opacity: 0.7; }
+        57% { opacity: 1; }
+        88% { opacity: 1; }
+        89% { opacity: 0.4; }
+        90% { opacity: 1; }
+        100% { opacity: 1; }
+      }
+
+      /* Combines the standard 50Hz hum flicker with the random voltage sags */
+      .voltage-flicker {
+        animation: flicker 0.1s infinite alternate, unstable-voltage 4s infinite;
+      }
+
+      /* Rainbow Cycle Animation */
+      @keyframes rainbow-cycle {
+        0% {
+          color: hsl(0, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(0, 100%, 50%),
+            0 0 10px hsl(0, 100%, 45%),
+            0 0 20px hsl(0, 100%, 40%),
+            0 0 40px hsl(0, 100%, 35%),
+            0 0 70px hsl(0, 100%, 30%);
+          -webkit-text-stroke-color: hsl(0, 100%, 85%);
+        }
+        20% {
+          color: hsl(72, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(72, 100%, 50%),
+            0 0 10px hsl(72, 100%, 45%),
+            0 0 20px hsl(72, 100%, 40%),
+            0 0 40px hsl(72, 100%, 35%),
+            0 0 70px hsl(72, 100%, 30%);
+          -webkit-text-stroke-color: hsl(72, 100%, 85%);
+        }
+        40% {
+          color: hsl(144, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(144, 100%, 50%),
+            0 0 10px hsl(144, 100%, 45%),
+            0 0 20px hsl(144, 100%, 40%),
+            0 0 40px hsl(144, 100%, 35%),
+            0 0 70px hsl(144, 100%, 30%);
+          -webkit-text-stroke-color: hsl(144, 100%, 85%);
+        }
+        60% {
+          color: hsl(216, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(216, 100%, 50%),
+            0 0 10px hsl(216, 100%, 45%),
+            0 0 20px hsl(216, 100%, 40%),
+            0 0 40px hsl(216, 100%, 35%),
+            0 0 70px hsl(216, 100%, 30%);
+          -webkit-text-stroke-color: hsl(216, 100%, 85%);
+        }
+        80% {
+          color: hsl(288, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(288, 100%, 50%),
+            0 0 10px hsl(288, 100%, 45%),
+            0 0 20px hsl(288, 100%, 40%),
+            0 0 40px hsl(288, 100%, 35%),
+            0 0 70px hsl(288, 100%, 30%);
+          -webkit-text-stroke-color: hsl(288, 100%, 85%);
+        }
+        100% {
+          color: hsl(360, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(360, 100%, 50%),
+            0 0 10px hsl(360, 100%, 45%),
+            0 0 20px hsl(360, 100%, 40%),
+            0 0 40px hsl(360, 100%, 35%),
+            0 0 70px hsl(360, 100%, 30%);
+          -webkit-text-stroke-color: hsl(360, 100%, 85%);
+        }
+      }
+
+      .rainbow-text {
+        animation: rainbow-cycle 8s linear infinite;
+      }
+      
+      /* Neon separator rainbow animation (background color + shadow) */
+      @keyframes rainbow-bg {
+        0% { background-color: hsl(0, 100%, 70%); box-shadow: 0 0 10px hsl(0, 100%, 50%); }
+        20% { background-color: hsl(72, 100%, 70%); box-shadow: 0 0 10px hsl(72, 100%, 50%); }
+        40% { background-color: hsl(144, 100%, 70%); box-shadow: 0 0 10px hsl(144, 100%, 50%); }
+        60% { background-color: hsl(216, 100%, 70%); box-shadow: 0 0 10px hsl(216, 100%, 50%); }
+        80% { background-color: hsl(288, 100%, 70%); box-shadow: 0 0 10px hsl(288, 100%, 50%); }
+        100% { background-color: hsl(360, 100%, 70%); box-shadow: 0 0 10px hsl(360, 100%, 50%); }
+      }
+      
+      .rainbow-bg {
+        animation: rainbow-bg 8s linear infinite;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
