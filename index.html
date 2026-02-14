@@ -3,251 +3,183 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050505" />
     <title>Retro Nixie Clock</title>
+    <meta name="description" content="High fidelity Nixie Tube clock" />
     
-    <!-- PWA -->
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json" />
+    
+    <!-- iOS PWA capability -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Nixie+One&family=Share+Tech+Mono&family=Orbitron&display=swap" rel="stylesheet">
+    <meta name="apple-mobile-web-app-title" content="Nixie Clock" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
 
-    <!-- CSS STYLES (Replaces Tailwind for iPad 2 Compatibility) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Imports: Nixie One, Share Tech Mono, Orbitron, Wallpoet -->
+    <link href="https://fonts.googleapis.com/css2?family=Nixie+One&family=Orbitron:wght@400;700&family=Share+Tech+Mono&family=Wallpoet&display=swap" rel="stylesheet">
     <style>
-      /* Reset & Basics */
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-      body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #050505; font-family: 'Share Tech Mono', monospace; overflow: hidden; color: #fff; }
-      
-      /* Layout Utilities */
-      .app-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: radial-gradient(circle at center, #1a1a1a 0%, #000 80%); }
-      .clock-wrapper { display: flex; align-items: center; justify-content: center; transform-origin: center; transition: transform 0.3s; }
-      .group { display: flex; align-items: flex-end; margin: 0 5px; }
-      .separator { display: flex; flex-direction: column; justify-content: center; height: 100px; margin: 0 5px; gap: 15px; }
-      
-      /* Tube Styles */
-      .tube { position: relative; width: 60px; height: 100px; background: rgba(0,0,0,0.4); border-radius: 40px 40px 10px 10px; border: 1px solid rgba(255,255,255,0.1); margin: 0 2px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-      .digit-container { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Nixie One', cursive; font-size: 3.5rem; font-weight: bold; }
-      .digit { position: absolute; transition: opacity 0.1s; opacity: 0.05; color: #332222; }
-      .digit.active { opacity: 1; z-index: 2; text-shadow: 0 0 15px #ff5500, 0 0 30px #ff2200; color: #ffeebb; }
-      
-      /* Responsive Scaling */
-      @media (min-width: 768px) {
-        .tube { width: 90px; height: 150px; border-radius: 60px 60px 15px 15px; }
-        .digit-container { font-size: 5.5rem; }
-        .separator { height: 150px; gap: 25px; }
+      body {
+        background-color: #050505;
+        overflow: hidden; /* Prevent scrolling for app-like feel */
+        touch-action: none;
+        -webkit-touch-callout: none; /* Prevent iOS callouts */
+        -webkit-user-select: none;   /* Prevent text selection */
+        user-select: none;
       }
-      @media (min-width: 1024px) {
-        .tube { width: 110px; height: 180px; }
-        .digit-container { font-size: 7rem; }
-        .separator { height: 180px; gap: 30px; }
+      
+      /* Custom scrollbar hiding */
+      ::-webkit-scrollbar {
+        display: none;
       }
 
-      /* Neon Dot */
-      .dot { width: 8px; height: 8px; border-radius: 50%; background: #332222; transition: all 0.1s; opacity: 0.2; }
-      .dot.active { background: #ffaa88; box-shadow: 0 0 10px #ff5500, 0 0 20px #ff2200; opacity: 1; }
-
-      /* UI Controls */
-      .fab-container { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 100; }
-      .fab { background: rgba(50,50,50,0.6); border: 1px solid rgba(255,255,255,0.2); color: #ccc; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; }
-      .fab:active { background: #fff; color: #000; }
-
-      /* Settings Modal */
-      .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-      .modal { background: #111; border: 1px solid #333; width: 90%; max-width: 380px; max-height: 80vh; overflow-y: auto; border-radius: 12px; padding: 20px; color: #eee; box-shadow: 0 20px 50px #000; }
-      .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 10px; }
-      .control-group { margin-bottom: 20px; }
-      .control-label { display: block; font-size: 12px; color: #888; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-      .btn-row { display: flex; background: #222; border-radius: 6px; overflow: hidden; border: 1px solid #333; }
-      .btn-opt { flex: 1; background: none; border: none; padding: 10px; color: #666; font-family: inherit; font-size: 14px; border-right: 1px solid #333; }
-      .btn-opt:last-child { border-right: none; }
-      .btn-opt.active { background: #ff5500; color: #000; text-shadow: none; font-weight: bold; }
+      /* Glow Animation for the tubes */
+      @keyframes flicker {
+        0% { opacity: 0.98; }
+        5% { opacity: 0.95; }
+        10% { opacity: 0.98; }
+        15% { opacity: 0.99; }
+        20% { opacity: 0.95; }
+        50% { opacity: 0.98; }
+        100% { opacity: 1; }
+      }
       
-      /* Error Log */
-      #error-log { position: fixed; top: 0; left: 0; width: 100%; background: rgba(150, 0, 0, 0.9); color: white; font-family: monospace; font-size: 10px; z-index: 9999; pointer-events: none; }
-      .log-entry { padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+      .tube-glow {
+        animation: flicker 0.1s infinite alternate;
+      }
+
+      /* Unstable Voltage / Glitch Animation */
+      @keyframes unstable-voltage {
+        0% { opacity: 1; }
+        3% { opacity: 0.6; }
+        5% { opacity: 0.9; }
+        6% { opacity: 1; }
+        25% { opacity: 1; }
+        26% { opacity: 0.3; }
+        28% { opacity: 1; }
+        29% { opacity: 0.2; }
+        30% { opacity: 1; }
+        55% { opacity: 1; }
+        56% { opacity: 0.7; }
+        57% { opacity: 1; }
+        88% { opacity: 1; }
+        89% { opacity: 0.4; }
+        90% { opacity: 1; }
+        100% { opacity: 1; }
+      }
+
+      /* Combines the standard 50Hz hum flicker with the random voltage sags */
+      .voltage-flicker {
+        animation: flicker 0.1s infinite alternate, unstable-voltage 4s infinite;
+      }
+
+      /* Rainbow Cycle Animation */
+      @keyframes rainbow-cycle {
+        0% {
+          color: hsl(0, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(0, 100%, 50%),
+            0 0 10px hsl(0, 100%, 45%),
+            0 0 20px hsl(0, 100%, 40%),
+            0 0 40px hsl(0, 100%, 35%),
+            0 0 70px hsl(0, 100%, 30%);
+          -webkit-text-stroke-color: hsl(0, 100%, 85%);
+        }
+        20% {
+          color: hsl(72, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(72, 100%, 50%),
+            0 0 10px hsl(72, 100%, 45%),
+            0 0 20px hsl(72, 100%, 40%),
+            0 0 40px hsl(72, 100%, 35%),
+            0 0 70px hsl(72, 100%, 30%);
+          -webkit-text-stroke-color: hsl(72, 100%, 85%);
+        }
+        40% {
+          color: hsl(144, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(144, 100%, 50%),
+            0 0 10px hsl(144, 100%, 45%),
+            0 0 20px hsl(144, 100%, 40%),
+            0 0 40px hsl(144, 100%, 35%),
+            0 0 70px hsl(144, 100%, 30%);
+          -webkit-text-stroke-color: hsl(144, 100%, 85%);
+        }
+        60% {
+          color: hsl(216, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(216, 100%, 50%),
+            0 0 10px hsl(216, 100%, 45%),
+            0 0 20px hsl(216, 100%, 40%),
+            0 0 40px hsl(216, 100%, 35%),
+            0 0 70px hsl(216, 100%, 30%);
+          -webkit-text-stroke-color: hsl(216, 100%, 85%);
+        }
+        80% {
+          color: hsl(288, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(288, 100%, 50%),
+            0 0 10px hsl(288, 100%, 45%),
+            0 0 20px hsl(288, 100%, 40%),
+            0 0 40px hsl(288, 100%, 35%),
+            0 0 70px hsl(288, 100%, 30%);
+          -webkit-text-stroke-color: hsl(288, 100%, 85%);
+        }
+        100% {
+          color: hsl(360, 100%, 85%);
+          text-shadow: 
+            0 0 5px hsl(360, 100%, 50%),
+            0 0 10px hsl(360, 100%, 45%),
+            0 0 20px hsl(360, 100%, 40%),
+            0 0 40px hsl(360, 100%, 35%),
+            0 0 70px hsl(360, 100%, 30%);
+          -webkit-text-stroke-color: hsl(360, 100%, 85%);
+        }
+      }
+
+      .rainbow-text {
+        animation: rainbow-cycle 8s linear infinite;
+      }
+      
+      /* Neon separator rainbow animation (background color + shadow) */
+      @keyframes rainbow-bg {
+        0% { background-color: hsl(0, 100%, 70%); box-shadow: 0 0 10px hsl(0, 100%, 50%); }
+        20% { background-color: hsl(72, 100%, 70%); box-shadow: 0 0 10px hsl(72, 100%, 50%); }
+        40% { background-color: hsl(144, 100%, 70%); box-shadow: 0 0 10px hsl(144, 100%, 50%); }
+        60% { background-color: hsl(216, 100%, 70%); box-shadow: 0 0 10px hsl(216, 100%, 50%); }
+        80% { background-color: hsl(288, 100%, 70%); box-shadow: 0 0 10px hsl(288, 100%, 50%); }
+        100% { background-color: hsl(360, 100%, 70%); box-shadow: 0 0 10px hsl(360, 100%, 50%); }
+      }
+      
+      .rainbow-bg {
+        animation: rainbow-bg 8s linear infinite;
+      }
     </style>
-
-    <!-- POLYFILLS (Strictly required for iOS 9) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
-
-    <!-- REACT 17 (Legacy) -->
-    <script crossorigin src="https://unpkg.com/react@17.0.2/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
-    
-    <!-- BABEL -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4"
   }
 }
 </script>
 </head>
   <body>
-    <div id="error-log"></div>
     <div id="root"></div>
-
-    <!-- 1. JS ERROR HANDLER -->
     <script>
-      window.onerror = function(message, source, lineno, colno, error) {
-        var log = document.getElementById('error-log');
-        var div = document.createElement('div');
-        div.className = 'log-entry';
-        div.textContent = "ERR: " + message + " (" + lineno + ")";
-        log.appendChild(div);
-        return false;
-      };
-      // Global Enums
-      window.ClockMode = { AUTO: 'AUTO', MANUAL: 'MANUAL' };
-      window.ClockSkin = { CLASSIC: 'CLASSIC', CYBER: 'CYBER', LIGHT: 'LIGHT', LED: 'LED' };
-    </script>
-
-    <!-- 2. REACT APP -->
-    <script type="text/babel" data-presets="env,react">
-      const { useState, useEffect, useMemo, useRef, useCallback } = React;
-      const { ClockMode, ClockSkin } = window;
-
-      // --- TUBE COMPONENT ---
-      const NixieTube = ({ value, label, skin }) => {
-        const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        
-        // Inline styles for skins to avoid huge CSS complexity
-        const getGlowColor = () => {
-          if (skin === ClockSkin.CYBER) return '#00ffff';
-          if (skin === ClockSkin.LIGHT) return '#0088ff';
-          if (skin === ClockSkin.LED) return '#d600ff';
-          return '#ff5500'; // Classic
-        };
-        
-        const glowColor = getGlowColor();
-        const activeStyle = {
-          opacity: 1,
-          zIndex: 2,
-          color: skin === ClockSkin.CLASSIC ? '#ffeebb' : '#ffffff',
-          textShadow: `0 0 10px ${glowColor}, 0 0 20px ${glowColor}, 0 0 40px ${glowColor}`
-        };
-
-        return (
-          <div className="flex flex-col items-center mx-1">
-            <div className="tube" style={{ borderColor: `${glowColor}44`, boxShadow: `0 0 15px ${glowColor}22` }}>
-              <div className="digit-container">
-                {digits.map(d => (
-                  <span key={d} className={`digit ${d === value ? 'active' : ''}`} style={d === value ? activeStyle : {}}>
-                    {d}
-                  </span>
-                ))}
-              </div>
-            </div>
-            {label && <span style={{fontSize: 10, marginTop: 4, color: glowColor, opacity: 0.6}}>{label}</span>}
-          </div>
-        );
-      };
-
-      // --- CONTROLS COMPONENT ---
-      const Controls = ({ skin, setSkin, onClose }) => {
-        return (
-          <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>SETTINGS</h3>
-                <button onClick={onClose} style={{background:'none',border:'none',color:'#fff',fontSize:20}}>✕</button>
-              </div>
-              
-              <div className="control-group">
-                <span className="control-label">Visual Style</span>
-                <div className="btn-row">
-                  <button className={`btn-opt ${skin === ClockSkin.CLASSIC ? 'active' : ''}`} onClick={() => setSkin(ClockSkin.CLASSIC)}>CLASSIC</button>
-                  <button className={`btn-opt ${skin === ClockSkin.CYBER ? 'active' : ''}`} onClick={() => setSkin(ClockSkin.CYBER)}>CYBER</button>
-                  <button className={`btn-opt ${skin === ClockSkin.LIGHT ? 'active' : ''}`} onClick={() => setSkin(ClockSkin.LIGHT)}>LIGHT</button>
-                </div>
-              </div>
-              <div style={{textAlign:'center', marginTop: 20, fontSize: 10, color: '#555'}}>
-                iPad 2 Compatible Mode
-              </div>
-            </div>
-          </div>
-        );
-      };
-
-      // --- MAIN APP ---
-      const App = () => {
-        const [time, setTime] = useState(new Date());
-        const [skin, setSkin] = useState(ClockSkin.CLASSIC);
-        const [showSettings, setShowSettings] = useState(false);
-        const [zoom, setZoom] = useState(1);
-
-        useEffect(() => {
-          const timer = setInterval(() => setTime(new Date()), 100);
-          return () => clearInterval(timer);
-        }, []);
-
-        const h = time.getHours();
-        const m = time.getMinutes();
-        const s = time.getSeconds();
-        const ms = time.getMilliseconds();
-        
-        const h1 = Math.floor(h / 10);
-        const h2 = h % 10;
-        const m1 = Math.floor(m / 10);
-        const m2 = m % 10;
-        const s1 = Math.floor(s / 10);
-        const s2 = s % 10;
-        
-        const dotActive = ms < 500;
-        const glowColor = skin === ClockSkin.CYBER ? '#00ffff' : (skin === ClockSkin.LIGHT ? '#0088ff' : '#ff5500');
-
-        return (
-          <div className="app-container">
-            <div className="clock-wrapper" style={{ transform: `scale(${zoom})` }}>
-              
-              {/* HOURS */}
-              <div className="group">
-                <NixieTube value={h1} skin={skin} />
-                <NixieTube value={h2} label="HOURS" skin={skin} />
-              </div>
-
-              {/* DOTS */}
-              <div className="separator">
-                 <div className={`dot ${dotActive ? 'active' : ''}`} style={dotActive ? {background: glowColor, boxShadow:`0 0 10px ${glowColor}`} : {}}></div>
-                 <div className={`dot ${dotActive ? 'active' : ''}`} style={dotActive ? {background: glowColor, boxShadow:`0 0 10px ${glowColor}`} : {}}></div>
-              </div>
-
-              {/* MINUTES */}
-              <div className="group">
-                <NixieTube value={m1} skin={skin} />
-                <NixieTube value={m2} label="MINS" skin={skin} />
-              </div>
-
-               {/* DOTS */}
-               <div className="separator">
-                 <div className={`dot ${dotActive ? 'active' : ''}`} style={dotActive ? {background: glowColor, boxShadow:`0 0 10px ${glowColor}`} : {}}></div>
-                 <div className={`dot ${dotActive ? 'active' : ''}`} style={dotActive ? {background: glowColor, boxShadow:`0 0 10px ${glowColor}`} : {}}></div>
-              </div>
-
-              {/* SECONDS */}
-              <div className="group">
-                <NixieTube value={s1} skin={skin} />
-                <NixieTube value={s2} label="SECS" skin={skin} />
-              </div>
-
-            </div>
-
-            {/* CONTROLS */}
-            <div className="fab-container">
-              <button className="fab" onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}>-</button>
-              <button className="fab" onClick={() => setZoom(z => Math.min(1.5, z + 0.1))}>+</button>
-              <button className="fab" onClick={() => setShowSettings(true)}>⚙</button>
-            </div>
-
-            {showSettings && <Controls skin={skin} setSkin={setSkin} onClose={() => setShowSettings(false)} />}
-          </div>
-        );
-      };
-
-      ReactDOM.render(<App />, document.getElementById('root'));
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js')
+            .then(registration => {
+              console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
     </script>
   </body>
 </html>
