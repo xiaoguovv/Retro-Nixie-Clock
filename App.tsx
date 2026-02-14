@@ -252,7 +252,7 @@ function App() {
 
   return (
     <div 
-      className="relative w-screen h-screen bg-[#0a0a0a] flex flex-col items-center justify-center overflow-hidden font-['Share_Tech_Mono'] cursor-pointer"
+      className="relative w-screen h-screen supports-[height:100dvh]:h-[100dvh] bg-[#0a0a0a] flex flex-col items-center justify-center overflow-hidden font-['Share_Tech_Mono'] cursor-pointer pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
       onClick={handleScreenClick}
     >
       
@@ -327,7 +327,7 @@ function App() {
 
       {/* UI Controls (Floating Action Buttons) */}
       <div 
-        className={`absolute bottom-8 right-8 z-30 flex gap-4 transition-opacity duration-300 ${uiVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`absolute bottom-8 right-8 z-30 flex gap-4 transition-opacity duration-300 pb-[env(safe-area-inset-bottom)] pr-[env(safe-area-inset-right)] ${uiVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Settings Toggle */}
