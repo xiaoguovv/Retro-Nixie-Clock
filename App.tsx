@@ -12,6 +12,7 @@ function App() {
   // Color configuration
   const [colorMode, setColorMode] = useState<ClockColorMode>(ClockColorMode.DEFAULT);
   const [customColor, setCustomColor] = useState<string>('#00ff00'); // Default Green for custom
+  const [rainbowHue, setRainbowHue] = useState<number>(0); // Dynamic Hue for Rainbow mode
 
   const [manualTimeOffset, setManualTimeOffset] = useState<number>(0); // in milliseconds
   const [showControls, setShowControls] = useState(false);
@@ -40,6 +41,38 @@ function App() {
   });
 
   const [separatorOn, setSeparatorOn] = useState(true);
+
+  // --- RAINBOW LOOP (JS-Based for Max Compatibility) ---
+  useEffect(() => {
+    if (colorMode !== ClockColorMode.RAINBOW) return;
+
+    let animationFrameId: number;
+    let currentHue = rainbowHue;
+
+    const animate = () => {
+      // Increment Hue. 0.5 per frame is roughly 30 degrees per second (12s full cycle)
+      currentHue = (currentHue + 0.5) % 360;
+      setRainbowHue(currentHue);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [colorMode]);
+
+  // Helper to get color for a specific position index
+  // Creates a rainbow wave effect across the clock
+  const getColorForIndex = (index: number) => {
+    if (colorMode === ClockColorMode.RAINBOW) {
+      // Offset the hue by 25 degrees per index to create a gradient wave
+      const hue = (rainbowHue - index * 25) % 360;
+      return `hsl(${Math.floor(hue)}, 100%, 75%)`;
+    }
+    return customColor;
+  };
 
   // Sound Toggle Handler
   const toggleSound = useCallback(() => {
@@ -292,26 +325,26 @@ function App() {
             
             {/* Hours */}
             <div className="flex z-10">
-              <NixieTube value={h1} skin={skin} font={font} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
-              <NixieTube value={h2} label="HOURS" skin={skin} font={font} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
+              <NixieTube value={h1} skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(0)} flickerEnabled={glitchEnabled} />
+              <NixieTube value={h2} label="HOURS" skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(1)} flickerEnabled={glitchEnabled} />
             </div>
 
-            <NeonSeparator on={separatorOn} skin={skin} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
+            <NeonSeparator on={separatorOn} skin={skin} colorMode={colorMode} customColor={getColorForIndex(2)} flickerEnabled={glitchEnabled} />
 
             {/* Minutes */}
             <div className="flex z-10">
-              <NixieTube value={m1} skin={skin} font={font} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
-              <NixieTube value={m2} label="MINUTES" skin={skin} font={font} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
+              <NixieTube value={m1} skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(3)} flickerEnabled={glitchEnabled} />
+              <NixieTube value={m2} label="MINUTES" skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(4)} flickerEnabled={glitchEnabled} />
             </div>
 
             {/* Seconds (Conditional) */}
             {precision === ClockPrecision.SECONDS && (
               <>
-                <NeonSeparator on={separatorOn} skin={skin} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
+                <NeonSeparator on={separatorOn} skin={skin} colorMode={colorMode} customColor={getColorForIndex(5)} flickerEnabled={glitchEnabled} />
 
                 <div className="flex z-10">
-                  <NixieTube value={s1} skin={skin} font={font} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
-                  <NixieTube value={s2} label="SECONDS" skin={skin} font={font} colorMode={colorMode} customColor={customColor} flickerEnabled={glitchEnabled} />
+                  <NixieTube value={s1} skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(6)} flickerEnabled={glitchEnabled} />
+                  <NixieTube value={s2} label="SECONDS" skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(7)} flickerEnabled={glitchEnabled} />
                 </div>
               </>
             )}
