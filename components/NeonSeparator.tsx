@@ -1,15 +1,11 @@
-import React, { useMemo } from 'react';
-import { ClockSkin, ClockColorMode } from '../types';
 
-interface NeonSeparatorProps {
-  on?: boolean;
-  skin: ClockSkin;
-  colorMode: ClockColorMode;
-  customColor: string;
-  flickerEnabled?: boolean;
-}
+const NeonSeparator = ({ on = true, skin, colorMode, customColor, flickerEnabled }: any) => {
+  const { useMemo } = React;
+  
+  // Access global enums
+  const ClockSkin = (window as any).ClockSkin;
+  const ClockColorMode = (window as any).ClockColorMode;
 
-const NeonSeparator: React.FC<NeonSeparatorProps> = ({ on = true, skin, colorMode, customColor, flickerEnabled }) => {
   const isClassic = skin === ClockSkin.CLASSIC;
   const isLight = skin === ClockSkin.LIGHT;
   const isLED = skin === ClockSkin.LED;
@@ -104,5 +100,4 @@ const NeonSeparator: React.FC<NeonSeparatorProps> = ({ on = true, skin, colorMod
     </div>
   );
 };
-
-export default NeonSeparator;
+(window as any).NeonSeparator = NeonSeparator;

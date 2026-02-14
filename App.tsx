@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import NixieTube from './components/NixieTube';
-import NeonSeparator from './components/NeonSeparator';
-import Controls from './components/Controls';
-import { ClockMode, ClockSkin, ClockFont, ClockColorMode, ClockPrecision } from './types';
 
-// Fix for webkitAudioContext
-declare global {
-  interface Window {
-    webkitAudioContext: typeof AudioContext;
-  }
-}
+const App = () => {
+  const { useState, useEffect, useCallback, useRef } = React;
+  
+  // Access global components and enums
+  const NixieTube = (window as any).NixieTube;
+  const NeonSeparator = (window as any).NeonSeparator;
+  const Controls = (window as any).Controls;
+  
+  const ClockMode = (window as any).ClockMode;
+  const ClockSkin = (window as any).ClockSkin;
+  const ClockFont = (window as any).ClockFont;
+  const ClockColorMode = (window as any).ClockColorMode;
+  const ClockPrecision = (window as any).ClockPrecision;
 
-function App() {
   const [mode, setMode] = useState(ClockMode.AUTO);
   const [skin, setSkin] = useState(ClockSkin.CLASSIC);
   const [font, setFont] = useState(ClockFont.NIXIE_ONE);
@@ -38,8 +39,8 @@ function App() {
   // UI Visibility State (Hidden by default for simulation feel)
   const [uiVisible, setUiVisible] = useState(false);
 
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const soundNodesRef = useRef<any>(null);
+  const audioCtxRef = useRef(null);
+  const soundNodesRef = useRef(null);
 
   const [timeState, setTimeState] = useState({
     hours: 0,
@@ -86,7 +87,7 @@ function App() {
     // If we are turning it on, ensure Context is created/resumed within user gesture
     if (!soundEnabled) {
       try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
         if (!audioCtxRef.current) {
           audioCtxRef.current = new AudioContext();
         }
@@ -114,7 +115,7 @@ function App() {
   useEffect(() => {
     if (soundEnabled) {
       try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
         if (!audioCtxRef.current) {
           audioCtxRef.current = new AudioContext();
         }
@@ -422,6 +423,5 @@ function App() {
       )}
     </div>
   );
-}
-
-export default App;
+};
+(window as any).App = App;

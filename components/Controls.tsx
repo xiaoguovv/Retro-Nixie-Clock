@@ -1,41 +1,5 @@
-import React from 'react';
-import { ClockMode, ClockSkin, ClockFont, ClockColorMode, ClockPrecision } from '../types';
 
-interface ControlsProps {
-  mode: ClockMode;
-  setMode: (mode: ClockMode) => void;
-  skin: ClockSkin;
-  setSkin: (skin: ClockSkin) => void;
-  manualTimeOffset: number;
-  setManualTimeOffset: (offset: number) => void;
-  font: ClockFont;
-  setFont: (font: ClockFont) => void;
-  colorMode: ClockColorMode;
-  setColorMode: (mode: ClockColorMode) => void;
-  customColor: string;
-  setCustomColor: (color: string) => void;
-  zoom: number;
-  setZoom: (zoom: number) => void;
-  soundEnabled: boolean;
-  toggleSound: () => void;
-  glitchEnabled: boolean;
-  toggleGlitch: () => void;
-  precision: ClockPrecision;
-  setPrecision: (precision: ClockPrecision) => void;
-  onClose: () => void;
-}
-
-const PRESET_COLORS = [
-  '#ff6600', // Classic Orange
-  '#ff0000', // Deep Red
-  '#00ff00', // Green
-  '#0088ff', // Blue
-  '#9d00ff', // Purple
-  '#00ffff', // Cyan
-  '#ffffff', // White
-];
-
-const Controls: React.FC<ControlsProps> = ({ 
+const Controls = ({ 
   mode, 
   setMode, 
   skin,
@@ -57,8 +21,25 @@ const Controls: React.FC<ControlsProps> = ({
   precision,
   setPrecision,
   onClose
-}) => {
-  const handleModeChange = (newMode: ClockMode) => {
+}: any) => {
+  // Access global enums
+  const ClockMode = (window as any).ClockMode;
+  const ClockSkin = (window as any).ClockSkin;
+  const ClockFont = (window as any).ClockFont;
+  const ClockColorMode = (window as any).ClockColorMode;
+  const ClockPrecision = (window as any).ClockPrecision;
+
+  const PRESET_COLORS = [
+    '#ff6600', // Classic Orange
+    '#ff0000', // Deep Red
+    '#00ff00', // Green
+    '#0088ff', // Blue
+    '#9d00ff', // Purple
+    '#00ffff', // Cyan
+    '#ffffff', // White
+  ];
+
+  const handleModeChange = (newMode: any) => {
     setMode(newMode);
     if (newMode === ClockMode.AUTO) {
       setManualTimeOffset(0);
@@ -315,7 +296,7 @@ const Controls: React.FC<ControlsProps> = ({
             <div className="bg-gray-800 p-2 rounded-lg">
               <select 
                 value={font} 
-                onChange={(e) => setFont(e.target.value as ClockFont)}
+                onChange={(e) => setFont(e.target.value as any)}
                 className={`w-full bg-gray-900 text-white p-2 rounded border focus:outline-none ${activeBorderClass} border-gray-700`}
               >
                 <option value={ClockFont.NIXIE_ONE}>Nixie One (Thin)</option>
@@ -398,5 +379,4 @@ const Controls: React.FC<ControlsProps> = ({
     </div>
   );
 };
-
-export default Controls;
+(window as any).Controls = Controls;

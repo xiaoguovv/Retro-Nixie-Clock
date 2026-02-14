@@ -1,35 +1,44 @@
-export interface TimeState {
+
+// We use (window as any) assignments to ensure these are available globally across files
+// when running without a bundler.
+
+interface TimeState {
   hours: number;
   minutes: number;
   seconds: number;
 }
 
-export enum ClockMode {
+enum ClockMode {
   AUTO = 'AUTO',
   MANUAL = 'MANUAL',
 }
+(window as any).ClockMode = ClockMode;
 
-export enum ClockSkin {
+enum ClockSkin {
   CLASSIC = 'CLASSIC',
   CYBER = 'CYBER',
   LIGHT = 'LIGHT',
   LED = 'LED',
 }
+(window as any).ClockSkin = ClockSkin;
 
-export enum ClockFont {
+enum ClockFont {
   NIXIE_ONE = 'Nixie One',
   SHARE_TECH = 'Share Tech Mono',
   ORBITRON = 'Orbitron',
   WALLPOET = 'Wallpoet',
 }
+(window as any).ClockFont = ClockFont;
 
-export enum ClockColorMode {
+enum ClockColorMode {
   DEFAULT = 'DEFAULT',
   FIXED = 'FIXED',
   RAINBOW = 'RAINBOW',
 }
+(window as any).ClockColorMode = ClockColorMode;
 
-export enum ClockPrecision {
+enum ClockPrecision {
   SECONDS = 'SECONDS',
   MINUTES = 'MINUTES',
 }
+(window as any).ClockPrecision = ClockPrecision;

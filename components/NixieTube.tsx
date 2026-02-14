@@ -1,17 +1,12 @@
-import React, { useMemo } from 'react';
-import { ClockSkin, ClockFont, ClockColorMode } from '../types';
 
-interface NixieTubeProps {
-  value: number;
-  label?: string;
-  skin: ClockSkin;
-  font: ClockFont;
-  colorMode: ClockColorMode;
-  customColor: string;
-  flickerEnabled?: boolean;
-}
+const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEnabled }: any) => {
+  const { useMemo } = React;
+  
+  // Access global enums
+  const ClockSkin = (window as any).ClockSkin;
+  const ClockFont = (window as any).ClockFont;
+  const ClockColorMode = (window as any).ClockColorMode;
 
-const NixieTube: React.FC<NixieTubeProps> = ({ value, label, skin, font, colorMode, customColor, flickerEnabled }) => {
   const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const isClassic = skin === ClockSkin.CLASSIC;
   const isLight = skin === ClockSkin.LIGHT;
@@ -49,7 +44,6 @@ const NixieTube: React.FC<NixieTubeProps> = ({ value, label, skin, font, colorMo
   let currentColor: string | undefined;
 
   // With JS-based rainbow, we treat RAINBOW mode exactly like FIXED mode.
-  // The 'customColor' prop is updated rapidly by the parent to simulate rainbow.
   if (colorMode === ClockColorMode.FIXED || colorMode === ClockColorMode.RAINBOW) {
     const c = customColor; 
     currentTextShadow = `0 0 5px ${c}, 0 0 10px ${c}, 0 0 20px ${c}, 0 0 40px ${c}, 0 0 70px ${c}`;
@@ -164,5 +158,4 @@ const NixieTube: React.FC<NixieTubeProps> = ({ value, label, skin, font, colorMo
     </div>
   );
 };
-
-export default NixieTube;
+(window as any).NixieTube = NixieTube;
