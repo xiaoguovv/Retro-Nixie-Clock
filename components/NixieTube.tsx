@@ -1,10 +1,11 @@
+import React from 'react';
 
 const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEnabled }: any) => {
   const { useMemo } = React;
   
-  // Access global enums
+  // Access global enums safely
   const ClockSkin = (window as any).ClockSkin;
-  const ClockFont = (window as any).ClockFont;
+  // const ClockFont = window.ClockFont; // Unused in logic blocks below except for render
   const ClockColorMode = (window as any).ClockColorMode;
 
   const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -39,18 +40,16 @@ const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEn
   const defaultColorLight = '#ffddaa';
   const defaultColorLED = '#ffffff';
 
-  let currentTextShadow: string | undefined;
-  let currentStroke: string | undefined;
-  let currentColor: string | undefined;
+  let currentTextShadow;
+  let currentStroke;
+  let currentColor;
 
-  // With JS-based rainbow, we treat RAINBOW mode exactly like FIXED mode.
   if (colorMode === ClockColorMode.FIXED || colorMode === ClockColorMode.RAINBOW) {
     const c = customColor; 
     currentTextShadow = `0 0 5px ${c}, 0 0 10px ${c}, 0 0 20px ${c}, 0 0 40px ${c}, 0 0 70px ${c}`;
     currentColor = c; 
     currentStroke = `0.03em ${c}`;
   } else {
-    // Default Skins
     if (isCyber) {
         currentTextShadow = defaultShadowCyber;
         currentStroke = defaultStrokeCyber;
@@ -70,8 +69,7 @@ const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEn
     }
   }
 
-  // Animation Construction
-  const animList: string[] = [];
+  const animList = [];
   const delay = flickerEnabled ? animationDelay : '0s';
   
   animList.push(`flicker 0.1s infinite alternate ${delay}`);
@@ -80,7 +78,7 @@ const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEn
     animList.push(`unstable-voltage 4s infinite ${delay}`);
   }
 
-  const activeStyle: React.CSSProperties = {
+  const activeStyle = {
     fontFamily: `"${font}", monospace`,
     color: currentColor, 
     textShadow: currentTextShadow,
@@ -91,7 +89,7 @@ const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEn
     animation: animList.join(', '),
   };
 
-  const inactiveStyle: React.CSSProperties = {
+  const inactiveStyle = {
     fontFamily: `"${font}", monospace`,
     color: isCyber ? '#332a2a' : (isLight ? '#5c3a2a' : (isLED ? 'rgba(255,255,255,0.05)' : '#4a3b3b')), 
     textShadow: isLight ? '0 0 2px rgba(0,0,0,0.8)' : '0 1px 2px rgba(0,0,0,0.9)', 
@@ -102,12 +100,12 @@ const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEn
   };
 
   if (isLED) {
-     return (
+      return (
         <div className="relative flex flex-col items-center mx-1 sm:mx-2 group">
-           <div className="relative w-20 h-32 sm:w-24 sm:h-40 md:w-36 md:h-56 lg:w-44 lg:h-64 border-x-4 border-[#111] bg-black/40 backdrop-blur-sm shadow-xl rounded-sm overflow-hidden">
+            <div className="relative w-20 h-32 sm:w-24 sm:h-40 md:w-36 md:h-56 lg:w-44 lg:h-64 border-x-4 border-[#111] bg-black/40 backdrop-blur-sm shadow-xl rounded-sm overflow-hidden">
                 <div className="absolute top-0 inset-x-0 h-4 bg-[#222] border-b border-[#333] z-30 flex justify-between items-center px-1">
-                   <div className="w-1.5 h-1.5 rounded-full bg-black shadow-[inset_0_0_2px_gray]"></div>
-                   <div className="w-1.5 h-1.5 rounded-full bg-black shadow-[inset_0_0_2px_gray]"></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-black shadow-[inset_0_0_2px_gray]"></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-black shadow-[inset_0_0_2px_gray]"></div>
                 </div>
                 <div className="absolute inset-0 top-4 z-0 opacity-30 pointer-events-none" style={{ backgroundImage: acrylicStackBg }}></div>
                 <div className="absolute inset-0 top-4 flex items-center justify-center text-[5.5rem] sm:text-[7rem] md:text-[10rem] lg:text-[13rem] font-bold select-none z-20">
@@ -116,10 +114,10 @@ const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEn
                     ))}
                 </div>
                 <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-white/10 to-transparent z-10 pointer-events-none mix-blend-overlay"></div>
-           </div>
-           {label && <span className="mt-3 text-[10px] sm:text-xs font-mono font-bold tracking-[0.2em] uppercase opacity-40 text-gray-400">{label}</span>}
+            </div>
+            {label && <span className="mt-3 text-[10px] sm:text-xs font-mono font-bold tracking-[0.2em] uppercase opacity-40 text-gray-400">{label}</span>}
         </div>
-     )
+      )
   }
 
   let tubeContainerClasses = isClassic ? "bg-[#0a0505] border-white/10 shadow-[inset_0_0_30px_rgba(0,0,0,1),0_0_15px_rgba(20,0,0,0.5)]" : (isLight ? "bg-[#02050a]/90 border border-[#2060ff]/50 shadow-[0_0_15px_rgba(0,100,255,0.4),inset_0_0_20px_rgba(0,40,100,0.6)] backdrop-blur-sm" : "bg-[#000810]/60 border-cyan-400/20 shadow-[inset_0_0_20px_rgba(0,10,20,0.9),0_0_15px_rgba(0,255,255,0.1)] backdrop-blur-[1px]");
@@ -149,13 +147,14 @@ const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEn
       </div>
       <div className={`w-16 sm:w-20 md:w-28 h-3 sm:h-5 rounded-b-lg border-t mt-[-2px] relative z-[-1] flex justify-center items-center transition-colors duration-500 ${baseClasses}`}>
         <div className="flex gap-2 opacity-50">
-           <div className={`w-[2px] h-2 ${isCyber ? 'bg-gray-600' : 'bg-[#443322]'}`}></div>
-           <div className={`w-[2px] h-2 ${isCyber ? 'bg-gray-600' : 'bg-[#443322]'}`}></div>
-           <div className={`w-[2px] h-2 ${isCyber ? 'bg-gray-600' : 'bg-[#443322]'}`}></div>
+            <div className={`w-[2px] h-2 ${isCyber ? 'bg-gray-600' : 'bg-[#443322]'}`}></div>
+            <div className={`w-[2px] h-2 ${isCyber ? 'bg-gray-600' : 'bg-[#443322]'}`}></div>
+            <div className={`w-[2px] h-2 ${isCyber ? 'bg-gray-600' : 'bg-[#443322]'}`}></div>
         </div>
       </div>
       {label && <span className={`mt-3 text-[10px] sm:text-xs font-mono font-bold tracking-[0.2em] uppercase opacity-60 drop-shadow-sm transition-colors duration-500 ${isCyber ? 'text-cyan-700' : (isLight ? 'text-[#406080]' : 'text-[#774444]')}`}>{label}</span>}
     </div>
   );
 };
+
 (window as any).NixieTube = NixieTube;

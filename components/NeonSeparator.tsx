@@ -1,3 +1,4 @@
+import React from 'react';
 
 const NeonSeparator = ({ on = true, skin, colorMode, customColor, flickerEnabled }: any) => {
   const { useMemo } = React;

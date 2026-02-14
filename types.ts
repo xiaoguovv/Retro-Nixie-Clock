@@ -1,44 +1,66 @@
 
-// We use (window as any) assignments to ensure these are available globally across files
-// when running without a bundler.
+// Types and Enums
+// Attached to window to ensure global availability in browser-only runtime
 
-interface TimeState {
-  hours: number;
-  minutes: number;
-  seconds: number;
+interface Window {
+  ClockMode: {
+    AUTO: string;
+    MANUAL: string;
+  };
+  ClockSkin: {
+    CLASSIC: string;
+    CYBER: string;
+    LIGHT: string;
+    LED: string;
+  };
+  ClockFont: {
+    NIXIE_ONE: string;
+    SHARE_TECH: string;
+    ORBITRON: string;
+    WALLPOET: string;
+  };
+  ClockColorMode: {
+    DEFAULT: string;
+    FIXED: string;
+    RAINBOW: string;
+  };
+  ClockPrecision: {
+    SECONDS: string;
+    MINUTES: string;
+  };
+  // Components attached to window
+  NixieTube: any;
+  NeonSeparator: any;
+  Controls: any;
+  App: any;
 }
 
-enum ClockMode {
-  AUTO = 'AUTO',
-  MANUAL = 'MANUAL',
-}
-(window as any).ClockMode = ClockMode;
+window.ClockMode = {
+  AUTO: 'AUTO',
+  MANUAL: 'MANUAL'
+};
 
-enum ClockSkin {
-  CLASSIC = 'CLASSIC',
-  CYBER = 'CYBER',
-  LIGHT = 'LIGHT',
-  LED = 'LED',
-}
-(window as any).ClockSkin = ClockSkin;
+window.ClockSkin = {
+  CLASSIC: 'CLASSIC',
+  CYBER: 'CYBER',
+  LIGHT: 'LIGHT',
+  LED: 'LED'
+};
 
-enum ClockFont {
-  NIXIE_ONE = 'Nixie One',
-  SHARE_TECH = 'Share Tech Mono',
-  ORBITRON = 'Orbitron',
-  WALLPOET = 'Wallpoet',
-}
-(window as any).ClockFont = ClockFont;
+window.ClockFont = {
+  NIXIE_ONE: 'Nixie One',
+  SHARE_TECH: 'Share Tech Mono',
+  ORBITRON: 'Orbitron',
+  WALLPOET: 'Wallpoet'
+};
 
-enum ClockColorMode {
-  DEFAULT = 'DEFAULT',
-  FIXED = 'FIXED',
-  RAINBOW = 'RAINBOW',
-}
-(window as any).ClockColorMode = ClockColorMode;
+window.ClockColorMode = {
+  DEFAULT: 'DEFAULT',
+  FIXED: 'FIXED',
+  RAINBOW: 'RAINBOW'
+};
 
-enum ClockPrecision {
-  SECONDS = 'SECONDS',
-  MINUTES = 'MINUTES',
-}
-(window as any).ClockPrecision = ClockPrecision;
+window.ClockPrecision = {
+  SECONDS: 'SECONDS',
+  MINUTES: 'MINUTES'
+};

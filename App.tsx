@@ -1,3 +1,4 @@
+import React from 'react';
 
 const App = () => {
   const { useState, useEffect, useCallback, useRef } = React;
@@ -39,8 +40,8 @@ const App = () => {
   // UI Visibility State (Hidden by default for simulation feel)
   const [uiVisible, setUiVisible] = useState(false);
 
-  const audioCtxRef = useRef(null);
-  const soundNodesRef = useRef(null);
+  const audioCtxRef = useRef<any>(null);
+  const soundNodesRef = useRef<any>(null);
 
   const [timeState, setTimeState] = useState({
     hours: 0,
@@ -92,7 +93,7 @@ const App = () => {
           audioCtxRef.current = new AudioContext();
         }
         if (audioCtxRef.current.state === 'suspended') {
-          audioCtxRef.current.resume().catch(e => console.warn("Audio resume failed", e));
+          audioCtxRef.current.resume().catch((e: any) => console.warn("Audio resume failed", e));
         }
       } catch (e) {
         console.error("Audio init failed", e);
@@ -123,7 +124,7 @@ const App = () => {
         
         // Safety resume
         if (ctx.state === 'suspended') {
-          ctx.resume().catch(e => {});
+          ctx.resume().catch((e: any) => {});
         }
 
         // Master Gain for Effect
@@ -180,7 +181,7 @@ const App = () => {
       
       // Suspend context to save battery
       if (audioCtxRef.current && audioCtxRef.current.state === 'running') {
-        audioCtxRef.current.suspend().catch(e => {});
+        audioCtxRef.current.suspend().catch((e: any) => {});
       }
     }
 
