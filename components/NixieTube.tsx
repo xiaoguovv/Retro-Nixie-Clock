@@ -85,9 +85,6 @@ const NixieTube: React.FC<NixieTubeProps> = ({ value, label, skin, font, colorMo
   if (flickerEnabled) {
     animList.push(`unstable-voltage 4s infinite ${delay}`);
   }
-  
-  // Note: We do NOT push 'rainbow-cycle' animation here anymore. 
-  // Color cycling is handled by re-rendering with new `customColor` via JS.
 
   const activeStyle: React.CSSProperties = {
     fontFamily: `"${font}", monospace`,

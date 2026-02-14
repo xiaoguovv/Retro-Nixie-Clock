@@ -2,31 +2,38 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import NixieTube from './components/NixieTube';
 import NeonSeparator from './components/NeonSeparator';
 import Controls from './components/Controls';
-import { ClockMode, ClockSkin, TimeState, ClockFont, ClockColorMode, ClockPrecision } from './types';
+import { ClockMode, ClockSkin, ClockFont, ClockColorMode, ClockPrecision } from './types';
+
+// Fix for webkitAudioContext
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
 
 function App() {
-  const [mode, setMode] = useState<ClockMode>(ClockMode.AUTO);
-  const [skin, setSkin] = useState<ClockSkin>(ClockSkin.CLASSIC);
-  const [font, setFont] = useState<ClockFont>(ClockFont.NIXIE_ONE);
+  const [mode, setMode] = useState(ClockMode.AUTO);
+  const [skin, setSkin] = useState(ClockSkin.CLASSIC);
+  const [font, setFont] = useState(ClockFont.NIXIE_ONE);
   
   // Color configuration
-  const [colorMode, setColorMode] = useState<ClockColorMode>(ClockColorMode.DEFAULT);
-  const [customColor, setCustomColor] = useState<string>('#00ff00'); // Default Green for custom
-  const [rainbowHue, setRainbowHue] = useState<number>(0); // Dynamic Hue for Rainbow mode
+  const [colorMode, setColorMode] = useState(ClockColorMode.DEFAULT);
+  const [customColor, setCustomColor] = useState('#00ff00'); // Default Green for custom
+  const [rainbowHue, setRainbowHue] = useState(0); // Dynamic Hue for Rainbow mode
 
-  const [manualTimeOffset, setManualTimeOffset] = useState<number>(0); // in milliseconds
+  const [manualTimeOffset, setManualTimeOffset] = useState(0); // in milliseconds
   const [showControls, setShowControls] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Scale / Zoom factor (1 = default responsive size)
-  const [zoom, setZoom] = useState<number>(1);
+  const [zoom, setZoom] = useState(1);
 
   // Sound & Effects State
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [glitchEnabled, setGlitchEnabled] = useState(false);
   
   // Precision State (Seconds vs Minutes)
-  const [precision, setPrecision] = useState<ClockPrecision>(ClockPrecision.SECONDS);
+  const [precision, setPrecision] = useState(ClockPrecision.SECONDS);
 
   // UI Visibility State (Hidden by default for simulation feel)
   const [uiVisible, setUiVisible] = useState(false);
@@ -34,7 +41,7 @@ function App() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const soundNodesRef = useRef<any>(null);
 
-  const [timeState, setTimeState] = useState<TimeState>({
+  const [timeState, setTimeState] = useState({
     hours: 0,
     minutes: 0,
     seconds: 0
@@ -79,7 +86,7 @@ function App() {
     // If we are turning it on, ensure Context is created/resumed within user gesture
     if (!soundEnabled) {
       try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!audioCtxRef.current) {
           audioCtxRef.current = new AudioContext();
         }
@@ -107,7 +114,7 @@ function App() {
   useEffect(() => {
     if (soundEnabled) {
       try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!audioCtxRef.current) {
           audioCtxRef.current = new AudioContext();
         }

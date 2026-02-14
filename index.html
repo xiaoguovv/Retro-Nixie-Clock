@@ -42,18 +42,24 @@
         88% { opacity: 1; } 89% { opacity: 0.4; } 90% { opacity: 1; } 100% { opacity: 1; }
       }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@18.3.1",
-    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
-    "react/": "https://esm.sh/react@18.3.1/"
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>
 </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
+    <!-- Load scripts sequentially. Order matters! -->
+    <script type="text/babel" data-presets="react,typescript" src="./types.ts"></script>
+    <script type="text/babel" data-presets="react,typescript" src="./components/NeonSeparator.tsx"></script>
+    <script type="text/babel" data-presets="react,typescript" src="./components/NixieTube.tsx"></script>
+    <script type="text/babel" data-presets="react,typescript" src="./components/Controls.tsx"></script>
+    <script type="text/babel" data-presets="react,typescript" src="./App.tsx"></script>
+    <script type="text/babel" data-presets="react,typescript" src="./index.tsx"></script>
   </body>
 </html>

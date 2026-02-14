@@ -64,7 +64,6 @@ const NeonSeparator: React.FC<NeonSeparatorProps> = ({ on = true, skin, colorMod
     if (flickerEnabled) {
        animList.push(`unstable-voltage 4s infinite ${delay}`);
     }
-    // No rainbow-bg animation here; handled by parent color updates.
   }
 
   activeStyle.animation = animList.join(', ');
