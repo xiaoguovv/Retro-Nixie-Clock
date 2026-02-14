@@ -26,7 +26,7 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel Standalone (Compiles JSX in browser) -->
+    <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
@@ -83,16 +83,21 @@
   <body>
     <div id="root"></div>
 
+    <!-- GLOBAL CONSTANTS (Defined in standard JS to ensure global availability) -->
+    <script>
+      window.ClockMode = { AUTO: 'AUTO', MANUAL: 'MANUAL' };
+      window.ClockSkin = { CLASSIC: 'CLASSIC', CYBER: 'CYBER', LIGHT: 'LIGHT', LED: 'LED' };
+      window.ClockFont = { NIXIE_ONE: 'Nixie One', SHARE_TECH: 'Share Tech Mono', ORBITRON: 'Orbitron', WALLPOET: 'Wallpoet' };
+      window.ClockColorMode = { DEFAULT: 'DEFAULT', FIXED: 'FIXED', RAINBOW: 'RAINBOW' };
+      window.ClockPrecision = { SECONDS: 'SECONDS', MINUTES: 'MINUTES' };
+    </script>
+
     <!-- MAIN APPLICATION CODE -->
     <script type="text/babel" data-presets="env,react">
       const { useState, useEffect, useCallback, useRef, useMemo } = React;
-
-      // --- TYPES & CONSTANTS (Converted to Plain JS Objects) ---
-      const ClockMode = { AUTO: 'AUTO', MANUAL: 'MANUAL' };
-      const ClockSkin = { CLASSIC: 'CLASSIC', CYBER: 'CYBER', LIGHT: 'LIGHT', LED: 'LED' };
-      const ClockFont = { NIXIE_ONE: 'Nixie One', SHARE_TECH: 'Share Tech Mono', ORBITRON: 'Orbitron', WALLPOET: 'Wallpoet' };
-      const ClockColorMode = { DEFAULT: 'DEFAULT', FIXED: 'FIXED', RAINBOW: 'RAINBOW' };
-      const ClockPrecision = { SECONDS: 'SECONDS', MINUTES: 'MINUTES' };
+      
+      // Destructure constants from window for easier usage in React code
+      const { ClockMode, ClockSkin, ClockFont, ClockColorMode, ClockPrecision } = window;
 
       // --- NIXIE TUBE COMPONENT ---
       const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEnabled }) => {
