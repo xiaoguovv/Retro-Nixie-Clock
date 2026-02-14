@@ -22,9 +22,12 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Nixie+One&family=Orbitron:wght@400;700&family=Share+Tech+Mono&family=Wallpoet&display=swap" rel="stylesheet">
     
-    <!-- React & ReactDOM (UMD for browser support) -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- ESSENTIAL POLYFILLS FOR IPAD 2 / IOS 9 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.12.1/polyfill.min.js"></script>
+
+    <!-- React 17 & ReactDOM 17 (React 18 does NOT support iPad 2/iOS 9) -->
+    <script crossorigin src="https://unpkg.com/react@17.0.2/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.production.min.js"></script>
     
     <!-- Babel Standalone -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -83,20 +86,27 @@
   <body>
     <div id="root"></div>
 
-    <!-- GLOBAL CONSTANTS (Defined in standard JS to ensure global availability) -->
+    <!-- GLOBAL CONSTANTS (Using var for legacy compatibility) -->
     <script>
-      window.ClockMode = { AUTO: 'AUTO', MANUAL: 'MANUAL' };
-      window.ClockSkin = { CLASSIC: 'CLASSIC', CYBER: 'CYBER', LIGHT: 'LIGHT', LED: 'LED' };
-      window.ClockFont = { NIXIE_ONE: 'Nixie One', SHARE_TECH: 'Share Tech Mono', ORBITRON: 'Orbitron', WALLPOET: 'Wallpoet' };
-      window.ClockColorMode = { DEFAULT: 'DEFAULT', FIXED: 'FIXED', RAINBOW: 'RAINBOW' };
-      window.ClockPrecision = { SECONDS: 'SECONDS', MINUTES: 'MINUTES' };
+      var ClockMode = { AUTO: 'AUTO', MANUAL: 'MANUAL' };
+      var ClockSkin = { CLASSIC: 'CLASSIC', CYBER: 'CYBER', LIGHT: 'LIGHT', LED: 'LED' };
+      var ClockFont = { NIXIE_ONE: 'Nixie One', SHARE_TECH: 'Share Tech Mono', ORBITRON: 'Orbitron', WALLPOET: 'Wallpoet' };
+      var ClockColorMode = { DEFAULT: 'DEFAULT', FIXED: 'FIXED', RAINBOW: 'RAINBOW' };
+      var ClockPrecision = { SECONDS: 'SECONDS', MINUTES: 'MINUTES' };
+      
+      // Expose to window
+      window.ClockMode = ClockMode;
+      window.ClockSkin = ClockSkin;
+      window.ClockFont = ClockFont;
+      window.ClockColorMode = ClockColorMode;
+      window.ClockPrecision = ClockPrecision;
     </script>
 
     <!-- MAIN APPLICATION CODE -->
     <script type="text/babel" data-presets="env,react">
       const { useState, useEffect, useCallback, useRef, useMemo } = React;
       
-      // Destructure constants from window for easier usage in React code
+      // Destructure constants from window
       const { ClockMode, ClockSkin, ClockFont, ClockColorMode, ClockPrecision } = window;
 
       // --- NIXIE TUBE COMPONENT ---
@@ -504,12 +514,12 @@
         );
       }
 
-      // --- RENDER ---
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(
+      // --- RENDER (React 17 Style) ---
+      ReactDOM.render(
         <React.StrictMode>
           <App />
-        </React.StrictMode>
+        </React.StrictMode>,
+        document.getElementById('root')
       );
     </script>
 
