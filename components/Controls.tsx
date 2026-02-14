@@ -111,7 +111,7 @@ const Controls: React.FC<ControlsProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
       onClick={(e) => {
         e.stopPropagation();
         onClose();
