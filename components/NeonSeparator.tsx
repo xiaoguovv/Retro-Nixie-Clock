@@ -1,104 +1,93 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { ClockSkin, ClockColorMode } from '../types';
 
-const NeonSeparator = ({ on = true, skin, colorMode, customColor, flickerEnabled }: any) => {
-  const { useMemo } = React;
-  
-  // Access global enums
-  const ClockSkin = (window as any).ClockSkin;
-  const ClockColorMode = (window as any).ClockColorMode;
+const NeonSeparator = ({ on, skin, colorMode, customColor, flickerEnabled }: any) => {
+  const [flicker, setFlicker] = useState(false);
 
-  const isClassic = skin === ClockSkin.CLASSIC;
+  useEffect(() => {
+    if (!flickerEnabled) {
+      setFlicker(false);
+      return;
+    }
+    const interval = setInterval(() => {
+      if (Math.random() > 0.95) {
+        setFlicker(true);
+        setTimeout(() => setFlicker(false), 50 + Math.random() * 100);
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [flickerEnabled]);
+
+  const isCyber = skin === ClockSkin.CYBER;
   const isLight = skin === ClockSkin.LIGHT;
   const isLED = skin === ClockSkin.LED;
-  
-  const animationDelay = useMemo(() => `-${Math.random() * 5}s`, []);
 
-  let activeStyle: React.CSSProperties = {};
+  let baseColor = '#ff5500';
+  let glowColor = 'rgba(255, 85, 0, 0.8)';
+  let shadowColor = 'rgba(255, 85, 0, 0.4)';
 
-  // Treat Rainbow mode same as Fixed mode (using the dynamic `customColor` from props)
   if (colorMode === ClockColorMode.FIXED || colorMode === ClockColorMode.RAINBOW) {
-    activeStyle = {
-        backgroundColor: customColor,
-        boxShadow: `0 0 4px ${customColor}, 0 0 8px ${customColor}, 0 0 16px ${customColor}`,
-        opacity: 1,
-    };
+    baseColor = customColor;
+    glowColor = customColor;
+    shadowColor = customColor;
   } else {
-    // Default
-    if (isClassic) {
-        activeStyle = {
-            backgroundColor: '#ffaa88',
-            boxShadow: `0 0 4px #ff4400, 0 0 8px #ff2200, 0 0 16px #ff0000`,
-            opacity: 1,
-        };
+    if (isCyber) {
+      baseColor = '#00ffff';
+      glowColor = 'rgba(0, 255, 255, 0.8)';
+      shadowColor = 'rgba(0, 255, 255, 0.4)';
     } else if (isLight) {
-        activeStyle = {
-            backgroundColor: '#ffcc00',
-            boxShadow: `0 0 4px #ffaa00, 0 0 10px #ff8800`,
-            opacity: 1,
-        };
+      baseColor = '#0088ff';
+      glowColor = 'rgba(0, 136, 255, 0.8)';
+      shadowColor = 'rgba(0, 136, 255, 0.4)';
     } else if (isLED) {
-        activeStyle = {
-            backgroundColor: '#d600ff',
-            boxShadow: `0 0 4px #d600ff, 0 0 10px #8000ff`,
-            opacity: 1,
-        };
-    } else {
-         activeStyle = {
-            backgroundColor: '#ffcccc',
-            boxShadow: `0 0 4px #ff3333, 0 0 8px #ff0000, 0 0 16px #cc0000`,
-            opacity: 1,
-        };
+      baseColor = '#d600ff';
+      glowColor = 'rgba(214, 0, 255, 0.8)';
+      shadowColor = 'rgba(214, 0, 255, 0.4)';
     }
   }
 
-  // Animation Construction
-  const animList: string[] = [];
-  const delay = flickerEnabled ? animationDelay : '0s';
+  const isOn = on && !flicker;
 
-  if (on) {
-    animList.push(`flicker 0.1s infinite alternate ${delay}`);
-    
-    if (flickerEnabled) {
-       animList.push(`unstable-voltage 4s infinite ${delay}`);
-    }
-  }
-
-  activeStyle.animation = animList.join(', ');
-
-  const inactiveStyle = {
-    backgroundColor: (isClassic) ? '#3a2222' : (isLight ? '#4a3020' : '#2a2020'),
-    boxShadow: 'none',
-    opacity: isLight ? 0.2 : 0.2,
+  const dotStyle = {
+    backgroundColor: isOn ? baseColor : 'transparent',
+    boxShadow: isOn 
+      ? `0 0 10px ${glowColor}, 0 0 20px ${shadowColor}` 
+      : 'none',
+    borderColor: isOn ? baseColor : 'rgba(255,255,255,0.1)',
+    transition: 'all 0.1s ease-in-out'
   };
-
-  let containerClasses = isClassic ? "bg-[#0a0505] border-white/10 shadow-[inset_0_0_10px_rgba(0,0,0,1)]" : (isLight ? "bg-[#02050a]/90 border border-[#2060ff]/50 shadow-[0_0_8px_rgba(0,100,255,0.4),inset_0_0_10px_rgba(0,40,100,0.6)] backdrop-blur-sm" : (isLED ? "bg-black/40 border-x-4 border-[#111] backdrop-blur-sm rounded-sm" : "bg-[#000810]/60 border-cyan-400/20 shadow-[inset_0_0_10px_rgba(0,255,255,0.05)]"));
 
   if (isLED) {
     return (
-        <div className="relative flex flex-col justify-center items-center h-32 sm:h-40 md:h-56 lg:h-64 gap-2 sm:gap-3 md:gap-4 mx-1 sm:mx-2 py-4">
-            <div className={`relative w-6 h-8 sm:h-10 border-t border-b border-[#222] flex items-center justify-center overflow-hidden transition-colors duration-500 ${containerClasses}`}>
-                 <div className="absolute top-0 inset-x-0 h-1 bg-[#222]"></div>
-                 <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-100 ease-in-out`} style={{ ...(on ? activeStyle : inactiveStyle) }} />
-            </div>
-            <div className={`relative w-6 h-8 sm:h-10 border-t border-b border-[#222] flex items-center justify-center overflow-hidden transition-colors duration-500 ${containerClasses}`}>
-                 <div className="absolute top-0 inset-x-0 h-1 bg-[#222]"></div>
-                 <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-100 ease-in-out`} style={{ ...(on ? activeStyle : inactiveStyle) }} />
-            </div>
+      <div className="flex flex-col justify-center items-center px-1 sm:px-2 h-24 sm:h-32 md:h-40 lg:h-48">
+        <div className="flex flex-col gap-4 sm:gap-6">
+          <div 
+            className="w-2 h-2 sm:w-3 sm:h-3 rounded-full border border-white/10"
+            style={dotStyle}
+          ></div>
+          <div 
+            className="w-2 h-2 sm:w-3 sm:h-3 rounded-full border border-white/10"
+            style={dotStyle}
+          ></div>
         </div>
-    )
+      </div>
+    );
   }
 
   return (
-    <div className="relative flex flex-col justify-center items-center h-32 sm:h-40 md:h-56 lg:h-64 gap-2 sm:gap-3 md:gap-4 mx-1 sm:mx-2 py-4">
-      <div className={`relative w-4 h-8 sm:w-6 sm:h-10 rounded-full flex items-center justify-center overflow-hidden transition-colors duration-500 ${containerClasses}`}>
-        <div className={`absolute top-1 left-1 w-0.5 h-2 blur-[0.5px] rounded-full ${isLight ? 'bg-[#80b0ff]/60' : 'bg-white/40'}`}></div>
-        <div className={`w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full transition-all duration-100 ease-in-out`} style={{ ...(on ? activeStyle : inactiveStyle) }} />
-      </div>
-      <div className={`relative w-4 h-8 sm:w-6 sm:h-10 rounded-full flex items-center justify-center overflow-hidden transition-colors duration-500 ${containerClasses}`}>
-        <div className={`absolute top-1 left-1 w-0.5 h-2 blur-[0.5px] rounded-full ${isLight ? 'bg-[#80b0ff]/60' : 'bg-white/40'}`}></div>
-        <div className={`w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full transition-all duration-100 ease-in-out`} style={{ ...(on ? activeStyle : inactiveStyle) }} />
+    <div className="flex flex-col justify-center items-center px-1 sm:px-2 h-24 sm:h-32 md:h-40 lg:h-48">
+      <div className="flex flex-col gap-4 sm:gap-6">
+        <div 
+          className="w-2 h-2 sm:w-3 sm:h-3 rounded-full border border-white/10"
+          style={dotStyle}
+        ></div>
+        <div 
+          className="w-2 h-2 sm:w-3 sm:h-3 rounded-full border border-white/10"
+          style={dotStyle}
+        ></div>
       </div>
     </div>
   );
 };
-(window as any).NeonSeparator = NeonSeparator;
+
+export default NeonSeparator;

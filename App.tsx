@@ -1,19 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import NixieTube from './components/NixieTube';
+import NeonSeparator from './components/NeonSeparator';
+import Controls from './components/Controls';
+import { ClockMode, ClockSkin, ClockFont, ClockColorMode, ClockPrecision } from './types';
 
 const App = () => {
-  const { useState, useEffect, useCallback, useRef } = React;
-  
-  // Access global components and enums
-  const NixieTube = (window as any).NixieTube;
-  const NeonSeparator = (window as any).NeonSeparator;
-  const Controls = (window as any).Controls;
-  
-  const ClockMode = (window as any).ClockMode;
-  const ClockSkin = (window as any).ClockSkin;
-  const ClockFont = (window as any).ClockFont;
-  const ClockColorMode = (window as any).ClockColorMode;
-  const ClockPrecision = (window as any).ClockPrecision;
-
   const [mode, setMode] = useState(ClockMode.AUTO);
   const [skin, setSkin] = useState(ClockSkin.CLASSIC);
   const [font, setFont] = useState(ClockFont.NIXIE_ONE);
@@ -59,7 +50,6 @@ const App = () => {
     let currentHue = rainbowHue;
 
     const animate = () => {
-      // Increment Hue. 0.5 per frame is roughly 30 degrees per second (12s full cycle)
       currentHue = (currentHue + 0.5) % 360;
       setRainbowHue(currentHue);
       animationFrameId = requestAnimationFrame(animate);
@@ -72,20 +62,15 @@ const App = () => {
     };
   }, [colorMode]);
 
-  // Helper to get color for a specific position index
-  // Creates a rainbow wave effect across the clock
   const getColorForIndex = (index: number) => {
     if (colorMode === ClockColorMode.RAINBOW) {
-      // Offset the hue by 25 degrees per index to create a gradient wave
       const hue = (rainbowHue - index * 25) % 360;
       return `hsl(${Math.floor(hue)}, 100%, 75%)`;
     }
     return customColor;
   };
 
-  // Sound Toggle Handler
   const toggleSound = useCallback(() => {
-    // If we are turning it on, ensure Context is created/resumed within user gesture
     if (!soundEnabled) {
       try {
         const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -102,17 +87,14 @@ const App = () => {
     setSoundEnabled(prev => !prev);
   }, [soundEnabled]);
 
-  // Glitch Toggle Handler
   const toggleGlitch = useCallback(() => {
     setGlitchEnabled(prev => !prev);
   }, []);
 
-  // Screen Click Handler for Toggling UI
   const handleScreenClick = useCallback(() => {
     setUiVisible(prev => !prev);
   }, []);
 
-  // Sound Effect Logic
   useEffect(() => {
     if (soundEnabled) {
       try {
@@ -122,25 +104,18 @@ const App = () => {
         }
         const ctx = audioCtxRef.current;
         
-        // Safety resume
         if (ctx.state === 'suspended') {
           ctx.resume().catch((e: any) => {});
         }
 
-        // Master Gain for Effect
         const masterGain = ctx.createGain();
-        // Increased volume significantly so it is audible on tablets
         masterGain.gain.value = 0.15; 
         masterGain.connect(ctx.destination);
 
-        // Oscillator 1: Mains Hum (Sawtooth for buzz character)
         const osc1 = ctx.createOscillator();
         osc1.type = 'sawtooth';
-        osc1.frequency.value = 55; // Slightly offset from 50Hz for richer sound
+        osc1.frequency.value = 55;
 
-        // Filter 1: Lowpass 
-        // Increased cutoff to 600Hz (was 120Hz). 
-        // Small speakers cannot play 50Hz. They need the upper harmonics (100-500Hz) to be heard.
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.value = 600; 
@@ -150,15 +125,12 @@ const App = () => {
         filter.connect(masterGain);
         osc1.start();
 
-        // Oscillator 2: High frequency inverter whine
         const osc2 = ctx.createOscillator();
         osc2.type = 'sine';
-        // Lowered to 8kHz (was 14kHz) to be more universally audible and less harsh, 
-        // while still sounding like a capacitor whine.
         osc2.frequency.value = 8000; 
         
         const gain2 = ctx.createGain();
-        gain2.gain.value = 0.03; // Keep the whine subtle relative to the hum
+        gain2.gain.value = 0.03;
         
         osc2.connect(gain2);
         gain2.connect(masterGain);
@@ -170,7 +142,6 @@ const App = () => {
         console.error("Audio setup error", e);
       }
     } else {
-      // Cleanup nodes
       if (soundNodesRef.current) {
         soundNodesRef.current.oscs.forEach((o: any) => {
           try { o.stop(); o.disconnect(); } catch(e){}
@@ -179,14 +150,12 @@ const App = () => {
         soundNodesRef.current = null;
       }
       
-      // Suspend context to save battery
       if (audioCtxRef.current && audioCtxRef.current.state === 'running') {
         audioCtxRef.current.suspend().catch((e: any) => {});
       }
     }
 
     return () => {
-       // Cleanup on unmount
        if (soundNodesRef.current) {
          soundNodesRef.current.oscs.forEach((o: any) => {
             try { o.stop(); } catch(e){}
@@ -195,12 +164,9 @@ const App = () => {
     }
   }, [soundEnabled]);
 
-  // Main Clock Tick
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      
-      // If manual mode, add the offset to current system time
       const effectiveTime = mode === ClockMode.MANUAL 
         ? new Date(now.getTime() + manualTimeOffset)
         : now;
@@ -211,21 +177,15 @@ const App = () => {
         seconds: effectiveTime.getSeconds()
       });
 
-      // Synchronize separator blinking: ON for first 500ms, OFF for next 500ms
-      // This ensures it blinks exactly when the second changes
       setSeparatorOn(effectiveTime.getMilliseconds() < 500);
     };
 
-    // Update immediately
     updateTime();
-
-    // High precision timer to minimize drift and keep blinking tight
     const timerId = setInterval(updateTime, 50);
 
     return () => clearInterval(timerId);
   }, [mode, manualTimeOffset]);
 
-  // Handle Fullscreen
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch((e) => {
@@ -240,7 +200,6 @@ const App = () => {
     }
   }, []);
 
-  // Split digits helper
   const splitDigits = (num: number) => {
     return [Math.floor(num / 10), num % 10];
   };
@@ -249,25 +208,20 @@ const App = () => {
   const [m1, m2] = splitDigits(timeState.minutes);
   const [s1, s2] = splitDigits(timeState.seconds);
 
-  // Determine global background based on skin
   let bgGradient = "";
   if (skin === ClockSkin.CLASSIC) {
     bgGradient = 'radial-gradient(circle at center, #1a0800 0%, #000000 70%)';
   } else if (skin === ClockSkin.LIGHT) {
-    // Blue/Black void for blue glass look
     bgGradient = 'radial-gradient(circle at center, #001020 0%, #000510 50%, #000000 100%)';
   } else if (skin === ClockSkin.LED) {
-    // Dark matte desk look
     bgGradient = 'radial-gradient(circle at center, #1a1a1a 0%, #050505 80%)';
   } else {
     bgGradient = 'radial-gradient(circle at center, #050a14 0%, #000000 70%)';
   }
 
-  // Container Shadow styles
   const containerStyle = skin === ClockSkin.CLASSIC
     ? { boxShadow: '0 20px 50px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05)' }
     : (skin === ClockSkin.LIGHT 
-        // Subtle blue ambient glow for the container group
         ? { boxShadow: '0 0 0 rgba(0,0,0,0)' } 
         : (skin === ClockSkin.LED 
             ? { boxShadow: '0 0 0 rgba(0,0,0,0)' } 
@@ -277,10 +231,8 @@ const App = () => {
   if (skin === ClockSkin.CLASSIC) {
     containerBg = "bg-black/30 border-white/5";
   } else if (skin === ClockSkin.LIGHT) {
-    // Transparent/Invisible container for the floating tubes look
     containerBg = "bg-transparent border-none";
   } else if (skin === ClockSkin.LED) {
-     // LED skin is self-contained with its base
      containerBg = "bg-transparent border-none";
   } else {
     containerBg = "bg-[#02060a]/50 border-cyan-500/10";
@@ -297,42 +249,31 @@ const App = () => {
       className="relative w-screen h-screen bg-[#0a0a0a] flex flex-col items-center justify-center overflow-hidden font-['Share_Tech_Mono'] cursor-pointer"
       onClick={handleScreenClick}
     >
-      
-      {/* Background Ambience */}
       <div className="absolute inset-0 transition-all duration-1000 ease-in-out pointer-events-none opacity-80" 
            style={{ background: bgGradient }}></div>
       
-      {/* Wood/Metal Base Platform (Visual element) */}
-      {/* LED Skin Base */}
       {skin === ClockSkin.LED && (
          <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-[#2a1a10] via-[#3d2b22] to-transparent pointer-events-none"></div>
       )}
       
-      {/* Standard Base */}
       {(skin !== ClockSkin.LIGHT && skin !== ClockSkin.LED) && (
         <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t pointer-events-none from-black via-[#0f0f0f] to-transparent"></div>
       )}
 
-      {/* Main Clock Container */}
-      {/* This outer div handles responsive scaling */}
       <div className="relative z-10 flex flex-col items-center transition-transform duration-500 ease-out origin-center
           scale-[0.55] sm:scale-[0.65] md:scale-[0.75] lg:scale-[0.85] xl:scale-[1.0] 2xl:scale-[1.2]">
         
-        {/* Inner Zoom Wrapper - Handles user manual zoom */}
         <div 
           style={{ transform: `scale(${zoom})` }} 
           className="flex flex-col items-center transition-transform duration-200 ease-out origin-center"
         >
-          {/* LED Skin Wood Base Platform */}
           {skin === ClockSkin.LED && (
               <div className="absolute bottom-2 inset-x-[-20px] h-16 bg-[#3d251e] border-t-2 border-[#5d3a2e] rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.8)] z-0"></div>
           )}
 
-          {/* The Tubes */}
           <div className={`flex items-start justify-center p-2 sm:p-4 md:p-6 lg:p-8 rounded-3xl transition-all duration-500 ${containerBg}`}
                style={containerStyle}>
             
-            {/* Hours */}
             <div className="flex z-10">
               <NixieTube value={h1} skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(0)} flickerEnabled={glitchEnabled} />
               <NixieTube value={h2} label="HOURS" skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(1)} flickerEnabled={glitchEnabled} />
@@ -340,13 +281,11 @@ const App = () => {
 
             <NeonSeparator on={separatorOn} skin={skin} colorMode={colorMode} customColor={getColorForIndex(2)} flickerEnabled={glitchEnabled} />
 
-            {/* Minutes */}
             <div className="flex z-10">
               <NixieTube value={m1} skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(3)} flickerEnabled={glitchEnabled} />
               <NixieTube value={m2} label="MINUTES" skin={skin} font={font} colorMode={colorMode} customColor={getColorForIndex(4)} flickerEnabled={glitchEnabled} />
             </div>
 
-            {/* Seconds (Conditional) */}
             {precision === ClockPrecision.SECONDS && (
               <>
                 <NeonSeparator on={separatorOn} skin={skin} colorMode={colorMode} customColor={getColorForIndex(5)} flickerEnabled={glitchEnabled} />
@@ -360,19 +299,16 @@ const App = () => {
 
           </div>
 
-          {/* Reflection on surface */}
           <div className={`h-16 w-full opacity-20 scale-y-[-0.5] bg-gradient-to-t from-transparent blur-xl mt-[-20px] pointer-events-none transition-colors duration-500
             ${skin === ClockSkin.CYBER ? 'to-cyan-600' : (skin === ClockSkin.LIGHT ? 'to-[#0055ff]' : (skin === ClockSkin.LED ? 'to-purple-500' : 'to-[#ff5500]'))}`}>
           </div>
         </div>
       </div>
 
-      {/* UI Controls (Floating Action Buttons) */}
       <div 
         className={`absolute bottom-8 right-8 z-30 flex gap-4 transition-opacity duration-300 ${uiVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Settings Toggle */}
         <button 
           onClick={() => setShowControls(true)}
           className={`p-3 rounded-full bg-gray-800/50 border border-gray-600 text-gray-300 hover:text-black hover:shadow-[0_0_15px] transition-all duration-300
@@ -382,7 +318,6 @@ const App = () => {
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </button>
 
-        {/* Fullscreen Toggle */}
         <button 
           onClick={toggleFullscreen}
           className="p-3 rounded-full bg-gray-800/50 border border-gray-600 text-gray-300 hover:bg-white hover:text-black hover:shadow-lg transition-all duration-300"
@@ -396,7 +331,6 @@ const App = () => {
         </button>
       </div>
 
-      {/* Settings Modal */}
       {showControls && (
         <Controls 
           mode={mode} 
@@ -425,4 +359,5 @@ const App = () => {
     </div>
   );
 };
-(window as any).App = App;
+
+export default App;

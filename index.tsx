@@ -2,15 +2,43 @@
 // Monolithic Index File
 // Combines NeonSeparator, NixieTube, Controls, and App to avoid module loading issues in browser-only environment
 
-const React = (window as any).React;
-const ReactDOM = (window as any).ReactDOM;
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+
+// --- Enums ---
+export const ClockMode = {
+  AUTO: 'AUTO',
+  MANUAL: 'MANUAL'
+};
+
+export const ClockSkin = {
+  CLASSIC: 'CLASSIC',
+  CYBER: 'CYBER',
+  LIGHT: 'LIGHT',
+  LED: 'LED'
+};
+
+export const ClockFont = {
+  NIXIE_ONE: 'Nixie One',
+  SHARE_TECH: 'Share Tech Mono',
+  ORBITRON: 'Orbitron',
+  WALLPOET: 'Wallpoet'
+};
+
+export const ClockColorMode = {
+  DEFAULT: 'DEFAULT',
+  FIXED: 'FIXED',
+  RAINBOW: 'RAINBOW'
+};
+
+export const ClockPrecision = {
+  SECONDS: 'SECONDS',
+  MINUTES: 'MINUTES'
+};
 
 // --- COMPONENT: NeonSeparator ---
 const NeonSeparator = ({ on = true, skin, colorMode, customColor, flickerEnabled }: any) => {
   const { useMemo } = React;
-  
-  const ClockSkin = (window as any).ClockSkin;
-  const ClockColorMode = (window as any).ClockColorMode;
 
   const isClassic = skin === ClockSkin.CLASSIC;
   const isLight = skin === ClockSkin.LIGHT;
@@ -108,9 +136,6 @@ const NeonSeparator = ({ on = true, skin, colorMode, customColor, flickerEnabled
 const NixieTube = ({ value, label, skin, font, colorMode, customColor, flickerEnabled }: any) => {
   const { useMemo } = React;
   
-  const ClockSkin = (window as any).ClockSkin;
-  const ClockColorMode = (window as any).ClockColorMode;
-
   const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const isClassic = skin === ClockSkin.CLASSIC;
   const isLight = skin === ClockSkin.LIGHT;
@@ -284,11 +309,6 @@ const Controls = ({
   setPrecision,
   onClose
 }: any) => {
-  const ClockMode = (window as any).ClockMode;
-  const ClockSkin = (window as any).ClockSkin;
-  const ClockFont = (window as any).ClockFont;
-  const ClockColorMode = (window as any).ClockColorMode;
-  const ClockPrecision = (window as any).ClockPrecision;
 
   const PRESET_COLORS = [
     '#ff6600', '#ff0000', '#00ff00', '#0088ff', '#9d00ff', '#00ffff', '#ffffff'
@@ -501,12 +521,6 @@ const Controls = ({
 const App = () => {
   const { useState, useEffect, useCallback, useRef } = React;
   
-  const ClockMode = (window as any).ClockMode;
-  const ClockSkin = (window as any).ClockSkin;
-  const ClockFont = (window as any).ClockFont;
-  const ClockColorMode = (window as any).ClockColorMode;
-  const ClockPrecision = (window as any).ClockPrecision;
-
   const [mode, setMode] = useState(ClockMode.AUTO);
   const [skin, setSkin] = useState(ClockSkin.CLASSIC);
   const [font, setFont] = useState(ClockFont.NIXIE_ONE);
@@ -773,7 +787,7 @@ const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
-const root = ReactDOM.createRoot(rootElement);
+const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <App />

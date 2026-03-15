@@ -1,66 +1,29 @@
-
-// Types and Enums
-// Attached to window to ensure global availability in browser-only runtime
-
-interface Window {
-  ClockMode: {
-    AUTO: string;
-    MANUAL: string;
-  };
-  ClockSkin: {
-    CLASSIC: string;
-    CYBER: string;
-    LIGHT: string;
-    LED: string;
-  };
-  ClockFont: {
-    NIXIE_ONE: string;
-    SHARE_TECH: string;
-    ORBITRON: string;
-    WALLPOET: string;
-  };
-  ClockColorMode: {
-    DEFAULT: string;
-    FIXED: string;
-    RAINBOW: string;
-  };
-  ClockPrecision: {
-    SECONDS: string;
-    MINUTES: string;
-  };
-  // Components attached to window
-  NixieTube: any;
-  NeonSeparator: any;
-  Controls: any;
-  App: any;
+export enum ClockMode {
+  AUTO = 'AUTO',
+  MANUAL = 'MANUAL'
 }
 
-window.ClockMode = {
-  AUTO: 'AUTO',
-  MANUAL: 'MANUAL'
-};
+export enum ClockSkin {
+  CLASSIC = 'CLASSIC',
+  CYBER = 'CYBER',
+  LIGHT = 'LIGHT',
+  LED = 'LED'
+}
 
-window.ClockSkin = {
-  CLASSIC: 'CLASSIC',
-  CYBER: 'CYBER',
-  LIGHT: 'LIGHT',
-  LED: 'LED'
-};
+export enum ClockFont {
+  NIXIE_ONE = 'Nixie One',
+  SHARE_TECH = 'Share Tech Mono',
+  ORBITRON = 'Orbitron',
+  WALLPOET = 'Wallpoet'
+}
 
-window.ClockFont = {
-  NIXIE_ONE: 'Nixie One',
-  SHARE_TECH: 'Share Tech Mono',
-  ORBITRON: 'Orbitron',
-  WALLPOET: 'Wallpoet'
-};
+export enum ClockColorMode {
+  DEFAULT = 'DEFAULT',
+  FIXED = 'FIXED',
+  RAINBOW = 'RAINBOW'
+}
 
-window.ClockColorMode = {
-  DEFAULT: 'DEFAULT',
-  FIXED: 'FIXED',
-  RAINBOW: 'RAINBOW'
-};
-
-window.ClockPrecision = {
-  SECONDS: 'SECONDS',
-  MINUTES: 'MINUTES'
-};
+export enum ClockPrecision {
+  SECONDS = 'SECONDS',
+  MINUTES = 'MINUTES'
+}

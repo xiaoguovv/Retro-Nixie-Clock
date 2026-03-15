@@ -1,3 +1,5 @@
+import React from 'react';
+import { ClockMode, ClockSkin, ClockFont, ClockColorMode, ClockPrecision } from '../types';
 
 const Controls = ({ 
   mode, 
@@ -22,12 +24,6 @@ const Controls = ({
   setPrecision,
   onClose
 }: any) => {
-  // Access global enums
-  const ClockMode = (window as any).ClockMode;
-  const ClockSkin = (window as any).ClockSkin;
-  const ClockFont = (window as any).ClockFont;
-  const ClockColorMode = (window as any).ClockColorMode;
-  const ClockPrecision = (window as any).ClockPrecision;
 
   const PRESET_COLORS = [
     '#ff6600', // Classic Orange
@@ -379,4 +375,5 @@ const Controls = ({
     </div>
   );
 };
-(window as any).Controls = Controls;
+
+export default Controls;
